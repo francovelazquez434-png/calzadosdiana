@@ -411,6 +411,7 @@ tbody td{padding:12px 14px;font-size:.88rem;}
   .fin-subnav button{font-size:.72rem;padding:6px 10px;}
   #fin-dashboard>div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important;}
   #fin-stock-val>div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important;}
+  #fin-asesor>div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important;}
   .chart-bars{height:120px;}
 }
 @media(max-width:420px){
@@ -429,6 +430,27 @@ tbody td{padding:12px 14px;font-size:.88rem;}
 .tab-content{animation:fadeIn .25s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 .form-card,.pedido-card,.prov-card,.week-block,.falt-card,.consulta-card{transition:transform .2s,box-shadow .2s;}
+
+/* ══ ASESOR FINANCIERO ══ */
+.asesor-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg);border-radius:var(--radius-xs);margin-bottom:6px;border:1px solid var(--warm);gap:8px;flex-wrap:wrap;}
+.asesor-row .ar-label{font-weight:700;font-size:.88rem;flex:1;min-width:100px;}
+.asesor-row .ar-val{font-family:'Outfit',sans-serif;font-weight:800;font-size:.95rem;text-align:right;}
+.asesor-breakdown{background:var(--bg);border-radius:var(--radius);padding:16px;margin-bottom:12px;border:1px solid var(--warm);}
+.asesor-breakdown .ab-line{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--warm);font-size:.88rem;}
+.asesor-breakdown .ab-line:last-child{border-bottom:none;}
+.asesor-breakdown .ab-line.total{font-weight:800;font-size:1.05rem;border-top:2px solid var(--dark);padding-top:10px;margin-top:4px;}
+.asesor-tip{display:flex;gap:10px;align-items:flex-start;padding:12px 16px;background:var(--bg);border-radius:var(--radius-xs);margin-bottom:8px;border-left:3px solid var(--gold);font-size:.86rem;line-height:1.5;}
+.asesor-tip .at-icon{font-size:1.2rem;flex-shrink:0;}
+.asesor-prov-plan{background:var(--surface);border:1.5px solid var(--warm);border-radius:var(--radius);padding:16px;margin-bottom:10px;}
+.asesor-prov-plan .app-name{font-weight:800;font-size:.95rem;color:var(--dark);}
+.asesor-prov-plan .app-deuda{font-family:'Outfit',sans-serif;font-weight:800;color:var(--red);}
+.asesor-prov-plan .app-plan{font-size:.84rem;color:var(--mid);margin-top:6px;line-height:1.5;}
+.asesor-prov-plan .app-bar{height:8px;background:var(--warm);border-radius:100px;margin-top:8px;overflow:hidden;}
+.asesor-prov-plan .app-bar-fill{height:100%;border-radius:100px;transition:width .4s ease;}
+.obj-big{font-family:'Outfit',sans-serif;font-size:2.2rem;font-weight:800;color:var(--pink);text-align:center;margin:10px 0;}
+.obj-bar-wrap{background:var(--warm);border-radius:100px;height:32px;overflow:hidden;position:relative;margin:10px 0;}
+.obj-bar-fill{height:100%;border-radius:100px;transition:width .6s ease;}
+.obj-bar-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;color:var(--dark);}
 
 /* ══ EXPORT ══ */
 .export-btn-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
@@ -1061,6 +1083,7 @@ tbody td{padding:12px 14px;font-size:.88rem;}
       <button onclick="showFinSub('fin-stock-val',this)">&#128230; Valor Stock</button>
       <button onclick="showFinSub('fin-flujo',this)">&#128200; Flujo de Caja</button>
       <button onclick="showFinSub('fin-fiados',this)">&#128179; Fiados</button>
+      <button onclick="showFinSub('fin-asesor',this)">&#129504; Asesor</button>
     </div>
 
     <!-- ── DASHBOARD ── -->
@@ -1175,6 +1198,49 @@ tbody td{padding:12px 14px;font-size:.88rem;}
       <div class="kpi-grid" id="fin-fiados-kpis"></div>
       <div id="fin-fiados-list"></div>
     </div>
+
+    <!-- ── ASESOR FINANCIERO ── -->
+    <div id="fin-asesor" class="fin-sub">
+      <div class="section-title">&#129504; Tu Asesor Financiero</div>
+      <p style="font-size:.86rem;color:var(--mid);margin-bottom:16px;">An&#225;lisis autom&#225;tico basado en tus datos reales. Se actualiza cada vez que entr&#225;s.</p>
+
+      <!-- Objetivo del mes -->
+      <div class="fin-panel" style="border-left:4px solid var(--pink);border:2px solid var(--pink-light);background:linear-gradient(135deg,var(--pink-subtle),var(--surface));">
+        <div class="fin-panel-title" style="font-size:1.1rem;">&#127919; Objetivo del mes</div>
+        <div id="asesor-objetivo"></div>
+      </div>
+
+      <!-- Ganancia REAL -->
+      <div class="fin-panel" style="border-left:4px solid var(--green);">
+        <div class="fin-panel-title">&#128176; Tu ganancia REAL (descontando todo)</div>
+        <div id="asesor-ganancia"></div>
+      </div>
+
+      <!-- Deuda proveedores + plan de pago -->
+      <div class="fin-panel" style="border-left:4px solid var(--red);">
+        <div class="fin-panel-title">&#129309; Deudas con proveedores + Plan de pago</div>
+        <div id="asesor-deudas"></div>
+      </div>
+
+      <!-- Productos estrella vs problema -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="fin-panel" style="border-left:4px solid var(--green);">
+          <div class="fin-panel-title">&#11088; Productos estrella</div>
+          <div id="asesor-estrellas"></div>
+        </div>
+        <div class="fin-panel" style="border-left:4px solid var(--red);">
+          <div class="fin-panel-title">&#9888;&#65039; Productos problema</div>
+          <div id="asesor-problemas"></div>
+        </div>
+      </div>
+
+      <!-- Consejos -->
+      <div class="fin-panel" style="border-left:4px solid var(--gold);background:linear-gradient(135deg,#FFFBEB,var(--surface));">
+        <div class="fin-panel-title">&#128161; Consejos para este mes</div>
+        <div id="asesor-consejos"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -3761,6 +3827,7 @@ function renderFinanzas(){
   if(id==='fin-stock-val')renderFinStockVal();
   if(id==='fin-flujo')renderFinFlujo();
   if(id==='fin-fiados')renderFinFiados();
+  if(id==='fin-asesor')renderFinAsesor();
 }
 
 // ── helpers ──
@@ -4204,6 +4271,204 @@ function exportFinCSV(){
   flujoCaja.forEach(f=>{csv+=`${f.tipo},${f.monto},${f.fecha},${f.cat},"${f.desc||''}"\n`;});
   const blob=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`finanzas-${hoyStr()}.csv`;a.click();
   toast('Datos financieros exportados','success');
+}
+
+// ══════════════════════════════════════════
+// ══ ASESOR FINANCIERO ══
+// ══════════════════════════════════════════
+function renderFinAsesor(){
+  const h=hoyStr();
+  const mesActual=h.slice(0,7);
+  const diaDelMes=parseInt(h.slice(8,10));
+  const diasEnMes=new Date(parseInt(h.slice(0,4)),parseInt(h.slice(5,7)),0).getDate();
+  const diasRestantes=diasEnMes-diaDelMes;
+
+  // ═══ DATA ═══
+  const ventasMes=ventas.filter(v=>(v.fecha||'').slice(0,7)===mesActual);
+  const totalVentasMes=ventasMes.reduce((a,v)=>a+v.monto,0);
+  const ganBrutaMes=ventasMes.reduce((a,v)=>a+(v.ganancia||0),0);
+  const diasConVentas=[...new Set(ventasMes.map(v=>v.fecha))].length;
+  const promDiario=diasConVentas>0?totalVentasMes/diasConVentas:0;
+
+  // Gastos fijos del mes
+  const gastosMesPend=gastosFijos.filter(g=>g.estado==='pendiente').reduce((a,g)=>a+g.monto,0);
+  const gastosMesPag=gastosFijos.filter(g=>g.estado==='pagado'&&(g.venc||g.fecha||'').slice(0,7)===mesActual).reduce((a,g)=>a+g.monto,0);
+  const totalGastosFijos=gastosMesPend+gastosMesPag;
+
+  // Egresos del mes
+  const egresosMes=egresos.filter(e=>(e.fecha||'').slice(0,7)===mesActual).reduce((a,e)=>a+e.monto,0);
+
+  // Deudas
+  const deudasProv=proveedores.map(p=>{
+    const compras=movProv.filter(m=>m.provId===p.id&&m.tipo==='compra').reduce((s,m)=>s+m.monto,0);
+    const pagos=movProv.filter(m=>m.provId===p.id&&(m.tipo==='pago'||m.tipo==='devolucion')).reduce((s,m)=>s+m.monto,0);
+    const saldo=compras-pagos;
+    return{nombre:p.nombre,id:p.id,compras,pagos,saldo:Math.max(0,saldo),pctPagado:compras>0?Math.round(pagos/compras*100):100};
+  }).filter(p=>p.saldo>0).sort((a,b)=>b.saldo-a.saldo);
+  const deudaTotal=deudasProv.reduce((a,p)=>a+p.saldo,0);
+
+  // Fiados
+  const fiadosPend=fiados.filter(f=>f.estado!=='cobrado').reduce((a,f)=>{const pag=(f.pagos||[]).reduce((s,p)=>s+p.monto,0);return a+(f.monto-pag);},0);
+
+  // Ganancia REAL
+  const ganReal=ganBrutaMes-totalGastosFijos-egresosMes;
+
+  // Proyección
+  const proyeccionMes=promDiario*diasEnMes;
+
+  // Margen promedio
+  const margenProm=totalVentasMes>0?Math.round(ganBrutaMes/totalVentasMes*100):0;
+
+  // ═══ 1. OBJETIVO ═══
+  const meta=parseInt(localStorage.getItem('cdiana_meta_mensual'))||Math.round(proyeccionMes/100000)*100000||15000000;
+  const pctMeta=meta>0?Math.min(100,Math.round(totalVentasMes/meta*100)):0;
+  const faltaMeta=Math.max(0,meta-totalVentasMes);
+  const paresParaMeta=promDiario>0?Math.round(faltaMeta/(totalVentasMes/Math.max(1,ventasMes.length))):0;
+
+  let objColor=pctMeta>=100?'var(--green)':pctMeta>=70?'var(--pink)':pctMeta>=40?'var(--gold)':'var(--red)';
+  let objMsg=pctMeta>=100?'&#127881; &#161;OBJETIVO CUMPLIDO! Segui asi.':pctMeta>=70?'&#128170; Vas muy bien, falta poco.':pctMeta>=40?'&#9888;&#65039; Vas por la mitad, hay que acelerar.':'&#128308; Lejos del objetivo, hay que empujar fuerte.';
+
+  document.getElementById('asesor-objetivo').innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+      <div style="font-size:.84rem;color:var(--mid);font-weight:600;">Meta mensual: ${fmt(meta)}</div>
+      <div style="font-size:.78rem;color:var(--mid);">Dia ${diaDelMes} de ${diasEnMes} (${diasRestantes} dias restantes)</div>
+    </div>
+    <div class="obj-big" style="color:${objColor};">${pctMeta}%</div>
+    <div class="obj-bar-wrap">
+      <div class="obj-bar-fill" style="width:${pctMeta}%;background:${pctMeta>=100?'linear-gradient(90deg,var(--green),#34D399)':'linear-gradient(90deg,var(--pink),var(--pink-light))'};"></div>
+      <div class="obj-bar-label">${fmt(totalVentasMes)} de ${fmt(meta)}</div>
+    </div>
+    <div style="text-align:center;font-size:.88rem;margin-top:8px;">${objMsg}</div>
+    ${faltaMeta>0?'<div style="text-align:center;font-size:.82rem;color:var(--mid);margin-top:4px;">Faltan <strong>'+fmt(faltaMeta)+'</strong> &mdash; A tu ritmo actual necesit&#225;s ~'+Math.ceil(faltaMeta/Math.max(1,promDiario))+' d&#237;as h&#225;biles m&#225;s</div>':''}
+    <div style="text-align:center;margin-top:8px;font-size:.78rem;color:var(--light-mid);">Proyecci&#243;n al cierre del mes: <strong>${fmt(proyeccionMes)}</strong> (basado en ${fmt(promDiario)}/d&#237;a)</div>
+  `;
+
+  // ═══ 2. GANANCIA REAL ═══
+  document.getElementById('asesor-ganancia').innerHTML=`
+    <div class="asesor-breakdown">
+      <div class="ab-line"><span>&#128176; Ventas del mes</span><strong>${fmt(totalVentasMes)}</strong></div>
+      <div class="ab-line"><span>&#128200; Ganancia bruta (venta - costo mercanc&#237;a)</span><strong class="ganancia-pos">${fmt(ganBrutaMes)}</strong></div>
+      <div class="ab-line"><span style="color:var(--mid);">&#127978; Margen bruto promedio</span><strong>${margenProm}%</strong></div>
+      <div class="ab-line" style="color:var(--red);"><span>&#128354; Gastos fijos (pagados + pendientes)</span><strong>-${fmt(totalGastosFijos)}</strong></div>
+      <div class="ab-line" style="color:var(--red);"><span>&#128178; Egresos del mes</span><strong>-${fmt(egresosMes)}</strong></div>
+      <div class="ab-line total"><span>&#128081; GANANCIA NETA REAL</span><strong style="color:${ganReal>=0?'var(--green)':'var(--red)'};">${fmt(ganReal)}</strong></div>
+    </div>
+    ${totalGastosFijos===0?'<div class="asesor-tip"><span class="at-icon">&#9888;&#65039;</span><span><strong>No ten&#233;s gastos fijos cargados.</strong> Sin alquiler, luz, monotributo, etc. tu ganancia &#34;real&#34; no es real. And&#225; a &#127978; Gastos del Local y carg&#225; tus gastos mensuales para ver tu verdadera ganancia.</span></div>':''}
+    ${margenProm<20?'<div class="asesor-tip"><span class="at-icon">&#128308;</span><span><strong>Tu margen promedio es '+margenProm+'%, deber&#237;a ser 25-35%.</strong> Revis&#225; los productos con margen bajo en la secci&#243;n &#34;Productos problema&#34; de abajo y remarcalos o dej&#225; de comprarlos.</span></div>':''}
+    ${ganReal<0?'<div class="asesor-tip"><span class="at-icon">&#128680;</span><span><strong>Est&#225;s en n&#250;meros rojos este mes.</strong> Tus gastos superan tu ganancia bruta. Necesit&#225;s vender m&#225;s, subir m&#225;rgenes, o recortar gastos. Priorizá los productos estrella.</span></div>':''}
+    <div style="font-size:.82rem;color:var(--mid);margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:var(--radius-xs);border:1px solid var(--warm);">
+      &#128181; Te quedan en el bolsillo <strong style="font-size:1.1rem;color:${ganReal>=0?'var(--green)':'var(--red)'};">${fmt(ganReal)}</strong> despu&#233;s de pagar todo (sin contar deuda a proveedores de ${fmt(deudaTotal)})
+    </div>
+  `;
+
+  // ═══ 3. DEUDAS + PLAN DE PAGO ═══
+  if(!deudasProv.length){
+    document.getElementById('asesor-deudas').innerHTML='<div class="empty" style="padding:14px;">&#10003; No ten&#233;s deudas pendientes. &#161;Excelente!</div>';
+  } else {
+    const ingresoDiario=promDiario;
+    const pctDeuda=totalVentasMes>0?Math.round(deudaTotal/totalVentasMes*100):0;
+    let planHtml='<div style="margin-bottom:14px;">';
+    planHtml+='<div class="asesor-row"><span class="ar-label">&#128308; Deuda total</span><span class="ar-val" style="color:var(--red);">'+fmt(deudaTotal)+'</span></div>';
+    planHtml+='<div class="asesor-row"><span class="ar-label">Ratio deuda/ventas</span><span class="ar-val" style="color:'+(pctDeuda>60?'var(--red)':pctDeuda>40?'var(--gold)':'var(--green)')+';">'+pctDeuda+'%'+(pctDeuda>60?' (peligroso)':pctDeuda>40?' (alto)':' (controlado)')+'</span></div>';
+    planHtml+='</div>';
+
+    // Suggested: dedicate 30% of daily revenue to paying debt
+    const pagoDiarioSug=Math.round(ingresoDiario*0.30);
+    const pagoSemanalSug=pagoDiarioSug*6; // 6 days/week
+    const semanasLiquidar=pagoSemanalSug>0?Math.ceil(deudaTotal/pagoSemanalSug):99;
+
+    planHtml+='<div class="asesor-tip"><span class="at-icon">&#128161;</span><span><strong>Plan sugerido:</strong> Destinar el 30% de tus ventas diarias ('+fmt(pagoDiarioSug)+'/d&#237;a = '+fmt(pagoSemanalSug)+'/semana) a pagar proveedores. Con esto, liquid&#225;s toda la deuda en ~<strong>'+semanasLiquidar+' semanas</strong>.</span></div>';
+
+    // Per provider plan
+    deudasProv.forEach(p=>{
+      const pctDelTotal=deudaTotal>0?Math.round(p.saldo/deudaTotal*100):0;
+      const pagoSemProv=Math.round(pagoSemanalSug*pctDelTotal/100);
+      const semsLiq=pagoSemProv>0?Math.ceil(p.saldo/pagoSemProv):99;
+      const barColor=p.pctPagado<20?'var(--red)':p.pctPagado<60?'var(--gold)':'var(--green)';
+
+      planHtml+='<div class="asesor-prov-plan">';
+      planHtml+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">';
+      planHtml+='<span class="app-name">&#127981; '+p.nombre+'</span>';
+      planHtml+='<span class="app-deuda">'+fmt(p.saldo)+'</span>';
+      planHtml+='</div>';
+      planHtml+='<div class="app-bar"><div class="app-bar-fill" style="width:'+p.pctPagado+'%;background:'+barColor+';"></div></div>';
+      planHtml+='<div style="display:flex;justify-content:space-between;font-size:.76rem;color:var(--light-mid);margin-top:2px;"><span>Pagado: '+p.pctPagado+'% ('+fmt(p.pagos)+')</span><span>Total: '+fmt(p.compras)+'</span></div>';
+      planHtml+='<div class="app-plan">&#128197; <strong>Pagar '+fmt(pagoSemProv)+'/semana</strong> &rarr; Liquidado en ~'+semsLiq+' semanas</div>';
+      if(p.pctPagado===0)planHtml+='<div style="font-size:.78rem;color:var(--red);font-weight:700;margin-top:4px;">&#9888; $0 pagado &#8212; PRIORIDAD URGENTE. Hacer un pago esta semana.</div>';
+      planHtml+='</div>';
+    });
+
+    document.getElementById('asesor-deudas').innerHTML=planHtml;
+  }
+
+  // ═══ 4. PRODUCTOS ESTRELLA ═══
+  const prodData={};
+  ventasMes.forEach(v=>(v.items||[]).forEach(it=>{
+    const k=it.modelo||it.desc||'?';
+    if(!prodData[k])prodData[k]={uds:0,monto:0,gan:0,costo:0};
+    prodData[k].uds+=(it.cant||1);
+    prodData[k].monto+=(it.precio||0)*(it.cant||1);
+    prodData[k].gan+=((it.precio||0)-(it.costo||0))*(it.cant||1);
+    prodData[k].costo+=(it.costo||0)*(it.cant||1);
+  }));
+
+  const prodArr=Object.entries(prodData).map(([n,d])=>({nombre:n,...d,margen:d.monto>0?Math.round(d.gan/d.monto*100):0}));
+
+  // Stars: high margin + decent volume
+  const estrellas=prodArr.filter(p=>p.margen>=25&&p.uds>=3).sort((a,b)=>b.gan-a.gan).slice(0,8);
+  document.getElementById('asesor-estrellas').innerHTML=estrellas.length?estrellas.map((p,i)=>'<div class="asesor-row"><span style="font-weight:800;color:var(--green);margin-right:6px;">#'+(i+1)+'</span><span class="ar-label">'+p.nombre+'</span><span style="font-size:.78rem;color:var(--mid);">'+p.uds+' pares</span><span class="ar-val" style="color:var(--green);">'+p.margen+'% &middot; '+fmt(p.gan)+'</span></div>').join('')+'<div class="asesor-tip"><span class="at-icon">&#127775;</span><span><strong>Empuj&#225; estos productos.</strong> Son los que m&#225;s ganancia te dejan. Publicalos primero en Instagram, ponelos adelante en el local, y repon&#233; stock apenas baje.</span></div>'
+  :'<div class="empty" style="padding:10px;">Sin datos suficientes este mes.</div>';
+
+  // Problems: negative or very low margin
+  const problemas=prodArr.filter(p=>p.margen<15&&p.uds>=2).sort((a,b)=>a.margen-b.margen).slice(0,8);
+  document.getElementById('asesor-problemas').innerHTML=problemas.length?problemas.map((p,i)=>'<div class="asesor-row"><span style="font-weight:800;color:var(--red);margin-right:6px;">#'+(i+1)+'</span><span class="ar-label">'+p.nombre+'</span><span style="font-size:.78rem;color:var(--mid);">'+p.uds+' pares</span><span class="ar-val" style="color:'+(p.margen<0?'var(--red)':'var(--gold)')+';">'+p.margen+'%</span></div>').join('')+'<div class="asesor-tip"><span class="at-icon">&#128680;</span><span><strong>Estos productos te est&#225;n comiendo la ganancia.</strong> Sub&#237; el precio, negoci&#225; mejor costo con el proveedor, o dej&#225; de comprarlos.</span></div>'
+  :'<div class="empty" style="padding:10px;">&#10003; Todos tus productos tienen buen margen.</div>';
+
+  // ═══ 5. CONSEJOS ═══
+  let consejos=[];
+
+  // Consejo: objetivo
+  if(faltaMeta>0&&diasRestantes>0){
+    const ventaDiariaNecesaria=Math.round(faltaMeta/diasRestantes);
+    consejos.push({icon:'&#127919;',text:'Para llegar al objetivo necesit&#225;s vender <strong>'+fmt(ventaDiariaNecesaria)+'/d&#237;a</strong> los pr&#243;ximos '+diasRestantes+' d&#237;as. '+(ventaDiariaNecesaria>promDiario*1.3?'Es un desaf&#237;o &#8212; enfocate en venta cruzada y revendedoras.':'Es alcanzable a tu ritmo actual. &#161;Dale!')});
+  }
+
+  // Consejo: deuda
+  if(deudaTotal>0){
+    const provUrgente=deudasProv.find(p=>p.pctPagado===0);
+    if(provUrgente)consejos.push({icon:'&#128680;',text:'<strong>URGENTE:</strong> Le deb&#233;s '+fmt(provUrgente.saldo)+' a '+provUrgente.nombre+' y no le pagaste nada. Hac&#233; un pago esta semana aunque sea parcial. La relaci&#243;n con el proveedor es clave.'});
+  }
+
+  // Consejo: margen
+  if(margenProm<20&&margenProm>0){
+    consejos.push({icon:'&#128200;',text:'Tu margen promedio es <strong>'+margenProm+'%</strong>. El ideal para calzado es 25-35%. Si sub&#237;s solo un 5% el margen, con las mismas ventas ganar&#237;as <strong>'+fmt(Math.round(totalVentasMes*0.05))+'</strong> m&#225;s por mes.'});
+  }
+
+  // Consejo: stock muerto
+  const hace30=new Date();hace30.setDate(hace30.getDate()-30);const hace30str=hace30.toISOString().slice(0,10);
+  const vendidosIds=new Set();
+  ventas.filter(v=>v.fecha>=hace30str).forEach(v=>(v.items||[]).forEach(it=>{if(it.stockId)vendidosIds.add(it.stockId);}));
+  const muertos=stock.filter(p=>p.cantidad>0&&!vendidosIds.has(p.id)).length;
+  if(muertos>20){
+    const valorMuerto=stock.filter(p=>p.cantidad>0&&!vendidosIds.has(p.id)).reduce((a,p)=>a+(p.costo||0)*p.cantidad,0);
+    consejos.push({icon:'&#128164;',text:'Ten&#233;s <strong>'+muertos+' productos sin vender en 30 d&#237;as</strong> ('+fmt(valorMuerto)+' en costo). Hac&#233; una promo &#34;&#218;LTIMOS PARES&#34; en Instagram Stories con 15-20% de descuento para liberar esa plata.'});
+  }
+
+  // Consejo: ticket promedio
+  if(ventasMes.length>0){
+    const ticketProm=Math.round(totalVentasMes/ventasMes.length);
+    consejos.push({icon:'&#128176;',text:'Tu ticket promedio es <strong>'+fmt(ticketProm)+'</strong>. Ofrec&#233; un 10% de descuento en el segundo par para subirlo. Si cada clienta lleva 1 par m&#225;s, duplicar&#237;as la facturaci&#243;n.'});
+  }
+
+  // Consejo: revendedoras
+  consejos.push({icon:'&#128241;',text:'<strong>Revendedoras = volumen.</strong> Con +800 personas en el grupo de WhatsApp, si cada una vende 2 pares/mes a precio mayorista, son pares extra sin esfuerzo de venta directa. Activ&#225; el precio mayorista en el sistema.'});
+
+  // Consejo: gastos sin cargar
+  if(totalGastosFijos===0){
+    consejos.push({icon:'&#127978;',text:'<strong>No ten&#233;s gastos fijos cargados.</strong> And&#225; a Finanzas &rarr; Gastos del Local y carg&#225;: alquiler, luz, gas, internet, monotributo, IIBB, etc. Sin esto, tu ganancia &#34;real&#34; es una ilusi&#243;n.'});
+  }
+
+  document.getElementById('asesor-consejos').innerHTML=consejos.length?consejos.map(c=>'<div class="asesor-tip"><span class="at-icon">'+c.icon+'</span><span>'+c.text+'</span></div>').join(''):'<div class="empty" style="padding:14px;">&#10003; Todo en orden por ahora.</div>';
 }
 </script>
 <div id="cierre-caja-print"></div>
