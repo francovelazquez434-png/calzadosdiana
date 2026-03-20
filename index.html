@@ -482,6 +482,51 @@ tbody td{padding:12px 14px;font-size:.88rem;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--pink-light);border-radius:100px;}
 ::-webkit-scrollbar-thumb:hover{background:var(--pink);}
+
+/* ══ ARTICLE SELECTOR SYSTEM ══ */
+.art-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;}
+.art-card{background:var(--surface);border:2px solid #F3E8F0;border-radius:var(--radius);padding:14px;cursor:pointer;text-align:left;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;position:relative;}
+.art-card:hover{border-color:var(--pink-light);box-shadow:var(--shadow-pink);transform:translateY(-2px);}
+.art-card .art-name{font-family:'Outfit',sans-serif;font-weight:800;font-size:1rem;color:var(--dark);line-height:1.2;text-transform:uppercase;letter-spacing:.02em;}
+.art-card .art-colors{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;}
+.art-card .art-color-chip{font-size:.68rem;font-weight:600;background:var(--bg);border:1px solid var(--warm);border-radius:100px;padding:2px 8px;color:var(--mid);white-space:nowrap;}
+.art-card .art-stock{font-size:.74rem;color:var(--light-mid);margin-top:6px;font-weight:500;}
+.art-card .art-price{font-family:'Outfit',sans-serif;font-size:.95rem;color:var(--pink);margin-top:4px;font-weight:800;}
+.art-card .art-badge{position:absolute;top:8px;right:8px;background:var(--pink);color:#fff;border-radius:50%;width:22px;height:22px;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-pink);}
+
+/* Selector Modal Interior */
+.sel-color-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.sel-color-btn{border:2px solid #F3E8F0;border-radius:var(--radius-xs);padding:8px 16px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:.84rem;font-weight:700;color:var(--mid);background:var(--surface);transition:all .15s;}
+.sel-color-btn:hover{border-color:var(--pink-light);background:var(--pink-subtle);}
+.sel-color-btn.active{background:var(--pink);color:#fff;border-color:var(--pink);box-shadow:var(--shadow-pink);}
+.sel-color-btn .scb-stock{font-size:.68rem;font-weight:500;display:block;margin-top:2px;}
+.sel-talle-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;}
+.sel-talle-btn{border:2px solid #F3E8F0;border-radius:var(--radius-xs);padding:12px 8px;cursor:pointer;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;background:var(--surface);}
+.sel-talle-btn:hover{border-color:var(--pink-light);background:var(--pink-subtle);transform:translateY(-1px);}
+.sel-talle-btn.sin-stock{opacity:.4;cursor:not-allowed;border-style:dashed;}
+.sel-talle-btn.in-cart{border-color:var(--pink);background:var(--pink-subtle);}
+.sel-talle-btn .st-talle{font-weight:800;font-size:1.05rem;color:var(--dark);}
+.sel-talle-btn .st-stock{font-size:.7rem;color:var(--light-mid);margin-top:2px;}
+.sel-talle-btn .st-price{font-size:.76rem;color:var(--pink);margin-top:2px;font-weight:700;}
+.sel-talle-btn.sin-stock .st-talle{color:var(--light-mid);}
+.sel-talle-btn.sin-stock .st-stock{color:var(--red);font-weight:600;}
+.sel-art-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:14px;border-bottom:1.5px solid var(--warm);}
+.sel-art-name{font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:800;color:var(--pink);}
+.sel-art-sub{font-size:.84rem;color:var(--mid);font-weight:500;}
+.sel-section-label{font-size:.76rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+.sel-cart-summary{background:var(--cream);border-radius:var(--radius-xs);padding:10px 14px;margin-top:12px;font-size:.86rem;}
+.sel-cart-summary strong{color:var(--pink);}
+
+/* Art card for pedido mode (show sin stock items) */
+.art-card.ped-mode .art-color-chip.sin-stock{color:var(--red);border-color:#FECACA;font-style:italic;}
+
+@media(max-width:768px){
+  .art-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .sel-talle-grid{grid-template-columns:repeat(auto-fill,minmax(68px,1fr));}
+  .sel-color-bar{gap:4px;}
+  .sel-color-btn{padding:6px 12px;font-size:.78rem;}
+}
+
 </style>
 </head>
 <body>
@@ -494,7 +539,8 @@ tbody td{padding:12px 14px;font-size:.88rem;}
     <div style="width:60%;height:100%;background:linear-gradient(90deg,var(--pink),var(--pink-light));border-radius:100px;animation:loadBar 1.2s ease infinite;"></div>
   </div>
 </div>
-<style>@keyframes loadBar{0%{transform:translateX(-100%);}100%{transform:translateX(200%);}}</style>
+<style>@keyframes loadBar{0%{transform:translateX(-100%);}100%{transform:translateX(200%);}}
+</style>
 
 <header>
   <h1>&#10024; Calzados <em>Diana</em></h1>
@@ -1215,6 +1261,25 @@ tbody td{padding:12px 14px;font-size:.88rem;}
   </div>
 </div>
 
+
+<!-- ══ MODAL: SELECTOR DE ARTÍCULO (Color → Talle) ══ -->
+<div class="modal-overlay" id="modal-art-selector">
+  <div class="modal" style="max-width:620px;">
+    <div class="sel-art-header">
+      <div>
+        <div class="sel-art-name" id="sel-art-name"></div>
+        <div class="sel-art-sub" id="sel-art-sub"></div>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="cerrarModal('modal-art-selector')" style="margin-left:auto;">&#10005; Cerrar</button>
+    </div>
+    <div class="sel-section-label">&#127912; Color</div>
+    <div class="sel-color-bar" id="sel-color-bar"></div>
+    <div class="sel-section-label">&#128095; Talle &mdash; toc&#225; para agregar</div>
+    <div class="sel-talle-grid" id="sel-talle-grid"></div>
+    <div class="sel-cart-summary" id="sel-cart-summary" style="display:none;"></div>
+  </div>
+</div>
+
 </main>
 
 <!-- ══ MODALES ══ -->
@@ -1906,34 +1971,218 @@ function populateProvSels(){
   });
 }
 
-// ══ VENTA RÁPIDA ══
+// ══ VENTA RÁPIDA — ARTÍCULO → COLOR → TALLE ══
+let _selectorMode='venta'; // 'venta' | 'pedido'
+let _selectorModelo='';
+let _selectorColor='';
+
+function getArticulos(soloConStock){
+  const grupos={};
+  stock.forEach(p=>{
+    if(soloConStock && p.cantidad<=0) return;
+    const key=p.modelo.toUpperCase();
+    if(!grupos[key]) grupos[key]={modelo:p.modelo,colors:{},totalStock:0,minPrice:Infinity};
+    const g=grupos[key];
+    const ck=(p.color||'Sin color');
+    if(!g.colors[ck]) g.colors[ck]={items:[],totalStock:0};
+    g.colors[ck].items.push(p);
+    g.colors[ck].totalStock+=p.cantidad;
+    g.totalStock+=p.cantidad;
+    if(p.venta>0 && p.venta<g.minPrice) g.minPrice=p.venta;
+  });
+  return grupos;
+}
+
+function getArticulosTodos(){
+  const grupos={};
+  stock.forEach(p=>{
+    const key=p.modelo.toUpperCase();
+    if(!grupos[key]) grupos[key]={modelo:p.modelo,colors:{},totalStock:0,minPrice:Infinity};
+    const g=grupos[key];
+    const ck=(p.color||'Sin color');
+    if(!g.colors[ck]) g.colors[ck]={items:[],totalStock:0};
+    g.colors[ck].items.push(p);
+    g.colors[ck].totalStock+=p.cantidad;
+    g.totalStock+=p.cantidad;
+    if(p.venta>0 && p.venta<g.minPrice) g.minPrice=p.venta;
+  });
+  return grupos;
+}
+
+function carritoCountForModelo(modelo){
+  return carrito.filter(c=>c.modelo.toUpperCase()===modelo.toUpperCase()).reduce((a,c)=>a+c.cant,0);
+}
+function pedidoCountForModelo(modelo){
+  return itemsNuevoPedido.filter(it=>(it.desc||'').toUpperCase().includes(modelo.toUpperCase())).reduce((a,it)=>a+it.cant,0);
+}
+
 function renderProdGrid(){
   const q=(document.getElementById('v-buscar').value||'').toLowerCase();
-  const disponibles=stock.filter(p=>p.cantidad>0&&(!q||p.modelo.toLowerCase().includes(q)||(p.color||'').toLowerCase().includes(q)||String(p.talle).includes(q))).sort((a,b)=>{
-    const ma=a.modelo.toLowerCase(),mb=b.modelo.toLowerCase();
-    if(ma!==mb)return ma.localeCompare(mb);
-    const ca=(a.color||'').toLowerCase(),cb=(b.color||'').toLowerCase();
-    if(ca!==cb)return ca.localeCompare(cb);
-    return (parseFloat(a.talle)||0)-(parseFloat(b.talle)||0);
-  });
+  const articulos=getArticulos(true);
   const grid=document.getElementById('prod-grid');
-  if(!disponibles.length){
+  
+  let arts=Object.values(articulos);
+  if(q){
+    arts=arts.filter(a=>{
+      if(a.modelo.toLowerCase().includes(q)) return true;
+      for(const ck of Object.keys(a.colors)){
+        if(ck.toLowerCase().includes(q)) return true;
+        for(const p of a.colors[ck].items){
+          if(String(p.talle).includes(q)) return true;
+        }
+      }
+      return false;
+    });
+  }
+  arts.sort((a,b)=>a.modelo.toLowerCase().localeCompare(b.modelo.toLowerCase()));
+
+  if(!arts.length){
     grid.innerHTML=`<p style="color:var(--light-mid);font-size:.9rem;padding:8px 0;">${q?'Sin resultados para "'+q+'"':'No hay productos con stock disponible.'}</p>`;
     return;
   }
-  grid.innerHTML=disponibles.map(p=>{
-    const idx=stock.indexOf(p);
-    const enC=carrito.find(c=>c.stockId===p.id);
-    const tieneMay=!!(p.ventaMay&&p.ventaMay>0);
-    return`<button class="prod-btn ${enC?'in-cart':''}" onclick="clickProducto(${idx})">
-      ${enC?`<div class="cart-qty">${enC.cant}</div>`:''}
-      <div class="pnombre">${p.modelo}</div>
-      <div class="psub">${p.color||'Sin color'} &middot; T${p.talle}</div>
-      <div class="pprecio">${fmt(p.venta)}</div>
-      ${tieneMay?`<div class="pprecio-may">May: ${fmt(p.ventaMay)}</div>`:''}
-      <div class="pstock">Stock: ${p.cantidad}</div>
+  grid.className='art-grid';
+  grid.innerHTML=arts.map(a=>{
+    const colores=Object.keys(a.colors);
+    const enCarrito=carritoCountForModelo(a.modelo);
+    return`<div class="art-card" onclick="openArticleSelector('${a.modelo.replace(/'/g,"\\'")}','venta')">
+      ${enCarrito?`<div class="art-badge">${enCarrito}</div>`:''}
+      <div class="art-name">${a.modelo}</div>
+      <div class="art-colors">${colores.map(c=>`<span class="art-color-chip">${c}</span>`).join('')}</div>
+      <div class="art-price">${a.minPrice<Infinity?fmt(a.minPrice):''}</div>
+      <div class="art-stock">${a.totalStock} pares &middot; ${colores.length} color${colores.length>1?'es':''}</div>
+    </div>`;
+  }).join('');
+}
+
+function openArticleSelector(modelo, mode){
+  _selectorMode=mode||'venta';
+  _selectorModelo=modelo;
+  const soloConStock=(_selectorMode==='venta');
+  const articulos=soloConStock?getArticulos(true):getArticulosTodos();
+  const key=modelo.toUpperCase();
+  const art=articulos[key];
+  if(!art){toast('Artículo no encontrado','error');return;}
+  
+  document.getElementById('sel-art-name').textContent=art.modelo;
+  const colores=Object.keys(art.colors);
+  document.getElementById('sel-art-sub').textContent=art.totalStock+' pares en stock · '+colores.length+' color'+(colores.length>1?'es':'');
+  
+  // Default: select first color
+  _selectorColor=colores[0]||'';
+  renderSelectorColors(art);
+  renderSelectorTalles(art);
+  renderSelectorCartSummary();
+  document.getElementById('modal-art-selector').classList.add('open');
+}
+
+function renderSelectorColors(art){
+  if(!art){
+    const articulos=(_selectorMode==='venta')?getArticulos(true):getArticulosTodos();
+    art=articulos[_selectorModelo.toUpperCase()];
+    if(!art)return;
+  }
+  const colores=Object.keys(art.colors);
+  document.getElementById('sel-color-bar').innerHTML=colores.map(c=>{
+    const cdata=art.colors[c];
+    return`<button class="sel-color-btn ${c===_selectorColor?'active':''}" onclick="selectSelectorColor('${c.replace(/'/g,"\\'")}')">
+      ${c}
+      <span class="scb-stock">${cdata.totalStock} pares</span>
     </button>`;
   }).join('');
+}
+
+function selectSelectorColor(color){
+  _selectorColor=color;
+  const articulos=(_selectorMode==='venta')?getArticulos(true):getArticulosTodos();
+  const art=articulos[_selectorModelo.toUpperCase()];
+  if(!art)return;
+  renderSelectorColors(art);
+  renderSelectorTalles(art);
+}
+
+function renderSelectorTalles(art){
+  if(!art){
+    const articulos=(_selectorMode==='venta')?getArticulos(true):getArticulosTodos();
+    art=articulos[_selectorModelo.toUpperCase()];
+    if(!art)return;
+  }
+  const cdata=art.colors[_selectorColor];
+  if(!cdata){document.getElementById('sel-talle-grid').innerHTML='<p style="color:var(--light-mid);font-size:.86rem;">Seleccioná un color.</p>';return;}
+  
+  const items=cdata.items.sort((a,b)=>(parseFloat(a.talle)||0)-(parseFloat(b.talle)||0));
+  const grid=document.getElementById('sel-talle-grid');
+  
+  grid.innerHTML=items.map(p=>{
+    const sinStock=p.cantidad<=0;
+    const idx=stock.indexOf(p);
+    // Check if in carrito/pedido
+    let enLista=false;
+    if(_selectorMode==='venta'){
+      enLista=carrito.some(c=>c.stockId===p.id);
+    } else {
+      enLista=itemsNuevoPedido.some(it=>it.stockId===p.id);
+    }
+    const tieneMay=!!(p.ventaMay&&p.ventaMay>0);
+    return`<div class="sel-talle-btn ${sinStock?'sin-stock':''} ${enLista?'in-cart':''}" onclick="${sinStock&&_selectorMode==='venta'?'':(_selectorMode==='venta'?'addFromSelectorToCart('+idx+')':'addFromSelectorToPedido('+idx+')')}">
+      <div class="st-talle">T${p.talle}</div>
+      <div class="st-stock">${sinStock?'⚠ Sin stock':p.cantidad+' disp.'}</div>
+      <div class="st-price">${fmt(p.venta)}${tieneMay?'<br><span style="font-size:.66rem;color:var(--mid);">May '+fmt(p.ventaMay)+'</span>':''}</div>
+    </div>`;
+  }).join('');
+}
+
+function addFromSelectorToCart(idx){
+  const p=stock[idx];
+  const pos=carrito.findIndex(c=>c.stockId===p.id);
+  if(pos>=0){
+    carrito[pos].cant++;
+    if(carrito[pos].cant>p.cantidad)carrito[pos].cant=p.cantidad;
+  } else {
+    carrito.push({sIdx:idx,stockId:p.id,modelo:p.modelo,color:p.color,talle:p.talle,precio:p.venta,precioUnit:p.venta,precioMay:p.ventaMay||null,costo:p.costo,cant:1,provId:p.provId||null,usaMay:false});
+  }
+  renderCarrito();renderProdGrid();
+  // Update selector talle highlight
+  const articulos=getArticulos(true);
+  const art=articulos[_selectorModelo.toUpperCase()];
+  renderSelectorTalles(art);
+  renderSelectorCartSummary();
+  toast(p.modelo+' '+p.color+' T'+p.talle+' agregado','success',{duration:1500});
+}
+
+function addFromSelectorToPedido(idx){
+  const p=stock[idx];
+  const existe=itemsNuevoPedido.findIndex(it=>it.stockId===p.id);
+  if(existe>=0){
+    itemsNuevoPedido[existe].cant++;
+  } else {
+    itemsNuevoPedido.push({tipo:'stock',desc:p.modelo+(p.color?' - '+p.color:''),talle:p.talle,cant:1,sIdx:idx,stockId:p.id,precioUnit:p.venta,precioMay:p.ventaMay||0,costo:p.costo});
+  }
+  renderItemsPreviewPedido();renderPedProdGrid();
+  // Update selector
+  const articulos=getArticulosTodos();
+  const art=articulos[_selectorModelo.toUpperCase()];
+  renderSelectorTalles(art);
+  renderSelectorCartSummary();
+  toast(p.modelo+' '+p.color+' T'+p.talle+' agregado al pedido','success',{duration:1500});
+}
+
+function renderSelectorCartSummary(){
+  const cont=document.getElementById('sel-cart-summary');
+  let items=[];
+  if(_selectorMode==='venta'){
+    items=carrito.filter(c=>c.modelo.toUpperCase()===_selectorModelo.toUpperCase());
+  } else {
+    items=itemsNuevoPedido.filter(it=>(it.desc||'').toUpperCase().includes(_selectorModelo.toUpperCase()));
+  }
+  if(!items.length){cont.style.display='none';return;}
+  cont.style.display='';
+  const totalItems=items.reduce((a,it)=>a+it.cant,0);
+  const lista=items.map(it=>{
+    const color=it.color||'';
+    const talle=it.talle||'';
+    return`<span style="display:inline-block;background:var(--surface);border:1px solid var(--warm);border-radius:6px;padding:2px 8px;font-size:.8rem;margin:2px;">${color?color+' ':''}T${talle} x${it.cant}</span>`;
+  }).join('');
+  cont.innerHTML=`<strong>🛒 ${totalItems} par${totalItems>1?'es':''} de ${_selectorModelo}</strong><div style="margin-top:6px;">${lista}</div>`;
 }
 function clickProducto(idx){
   const p=stock[idx];
@@ -2367,26 +2616,44 @@ function eliminarEgreso(id){
 // ══ PEDIDOS ══
 function renderPedProdGrid(){
   const q=(document.getElementById('ped-buscar').value||'').toLowerCase();
-  // Show ALL products (including out of stock), sorted by modelo→talle
-  const productos=stock.filter(p=>!q||p.modelo.toLowerCase().includes(q)||(p.color||'').toLowerCase().includes(q)||String(p.talle).includes(q)).sort((a,b)=>{
-    // Con stock primero, luego sin stock
-    if(a.cantidad>0&&b.cantidad<=0)return -1;
-    if(a.cantidad<=0&&b.cantidad>0)return 1;
-    const ma=a.modelo.toLowerCase(),mb=b.modelo.toLowerCase();
-    if(ma!==mb)return ma.localeCompare(mb);
-    return (parseFloat(a.talle)||0)-(parseFloat(b.talle)||0);
-  });
+  const articulos=getArticulosTodos();
   const grid=document.getElementById('ped-prod-grid');
-  if(!productos.length){grid.innerHTML=`<p style="color:var(--light-mid);font-size:.9rem;padding:8px;">${q?'Sin resultados para "'+q+'"':'No hay productos cargados.'}</p>`;return;}
-  grid.innerHTML=productos.map(p=>{
-    const idx=stock.indexOf(p);
-    const yaEnPedido=itemsNuevoPedido.some(it=>it.stockId===p.id);
-    const sinStock=p.cantidad<=0;
-    return`<div class="ped-prod-card ${yaEnPedido?'seleccionado':''}" onclick="addProdPedido(${idx})" style="${sinStock?'opacity:.7;border-style:dashed;':''}">
-      <div class="pp-modelo">${p.modelo}</div>
-      <div class="pp-sub">${p.color||'Sin color'} · T${p.talle}</div>
-      <div style="font-family:'Outfit',sans-serif;font-size:.95rem;color:var(--terracotta);margin-top:4px;">${fmt(p.venta)}</div>
-      <div class="pp-stock" style="${sinStock?'color:var(--red);font-weight:600;':''}">${sinStock?'⚠ Sin stock':p.cantidad+' disponible'+(p.cantidad>1?'s':'')}</div>
+  
+  let arts=Object.values(articulos);
+  if(q){
+    arts=arts.filter(a=>{
+      if(a.modelo.toLowerCase().includes(q)) return true;
+      for(const ck of Object.keys(a.colors)){
+        if(ck.toLowerCase().includes(q)) return true;
+        for(const p of a.colors[ck].items){
+          if(String(p.talle).includes(q)) return true;
+        }
+      }
+      return false;
+    });
+  }
+  arts.sort((a,b)=>{
+    // Con stock primero
+    if(a.totalStock>0&&b.totalStock<=0)return -1;
+    if(a.totalStock<=0&&b.totalStock>0)return 1;
+    return a.modelo.toLowerCase().localeCompare(b.modelo.toLowerCase());
+  });
+
+  if(!arts.length){grid.innerHTML=`<p style="color:var(--light-mid);font-size:.9rem;padding:8px;">${q?'Sin resultados para "'+q+'"':'No hay productos cargados.'}</p>`;return;}
+  grid.className='art-grid';
+  grid.innerHTML=arts.map(a=>{
+    const colores=Object.keys(a.colors);
+    const enPedido=pedidoCountForModelo(a.modelo);
+    const sinStock=a.totalStock<=0;
+    return`<div class="art-card ped-mode" onclick="openArticleSelector('${a.modelo.replace(/'/g,"\\'")}','pedido')" style="${sinStock?'opacity:.7;border-style:dashed;':''}">
+      ${enPedido?`<div class="art-badge">${enPedido}</div>`:''}
+      <div class="art-name">${a.modelo}</div>
+      <div class="art-colors">${colores.map(c=>{
+        const cs=a.colors[c];
+        return`<span class="art-color-chip ${cs.totalStock<=0?'sin-stock':''}">${c}</span>`;
+      }).join('')}</div>
+      <div class="art-price">${a.minPrice<Infinity?fmt(a.minPrice):''}</div>
+      <div class="art-stock" style="${sinStock?'color:var(--red);font-weight:600;':''}">${sinStock?'⚠ Sin stock':a.totalStock+' pares · '+colores.length+' color'+(colores.length>1?'es':'')}</div>
     </div>`;
   }).join('');
 }
@@ -3038,28 +3305,72 @@ function setMercModo(m){
 }
 function renderMercProdGrid(){
   const q=(document.getElementById('merc-buscar').value||'').toLowerCase();
-  const prods=stock.filter(p=>!q||p.modelo.toLowerCase().includes(q)||(p.color||'').toLowerCase().includes(q)||String(p.talle).includes(q));
-  // Group by modelo+color
-  const grupos={};
-  prods.forEach(p=>{
-    const key=p.modelo+'|'+(p.color||'');
-    if(!grupos[key])grupos[key]={modelo:p.modelo,color:p.color,costo:p.costo,venta:p.venta,items:[p]};
-    else grupos[key].items.push(p);
-  });
+  const articulos=getArticulosTodos();
   const grid=document.getElementById('merc-prod-grid');
-  const arr=Object.values(grupos);
-  if(!arr.length){grid.innerHTML=`<p style="color:var(--light-mid);font-size:.9rem;padding:8px;">${q?'Sin resultados':'Sin productos.'}</p>`;return;}
-  grid.innerHTML=arr.map(g=>{
-    const totalStock=g.items.reduce((a,p)=>a+p.cantidad,0);
-    const talles=g.items.map(p=>p.talle).sort((a,b)=>(parseFloat(a)||0)-(parseFloat(b)||0)).join(', ');
-    const firstIdx=stock.indexOf(g.items[0]);
-    return`<div class="ped-prod-card" onclick="selMercExistente(${firstIdx})">
-      <div class="pp-modelo">${g.modelo}</div>
-      <div class="pp-sub">${g.color||'Sin color'}</div>
-      <div style="font-size:.74rem;color:var(--light-mid);margin-top:4px;">T: ${talles}</div>
-      <div class="pp-stock">${totalStock} en stock</div>
+  
+  let arts=Object.values(articulos);
+  if(q){
+    arts=arts.filter(a=>{
+      if(a.modelo.toLowerCase().includes(q)) return true;
+      for(const ck of Object.keys(a.colors)){
+        if(ck.toLowerCase().includes(q)) return true;
+      }
+      return false;
+    });
+  }
+  arts.sort((a,b)=>a.modelo.toLowerCase().localeCompare(b.modelo.toLowerCase()));
+
+  if(!arts.length){grid.innerHTML=`<p style="color:var(--light-mid);font-size:.9rem;padding:8px;">${q?'Sin resultados':'Sin productos.'}</p>`;return;}
+  grid.className='art-grid';
+  // Show articles first, then on click expand to color selection
+  grid.innerHTML=arts.map(a=>{
+    const colores=Object.keys(a.colors);
+    return`<div class="art-card" onclick="openMercArticleSelector('${a.modelo.replace(/'/g,"\\'")}')">
+      <div class="art-name" style="font-size:.88rem;">${a.modelo}</div>
+      <div class="art-colors">${colores.map(c=>`<span class="art-color-chip">${c}</span>`).join('')}</div>
+      <div class="art-stock">${a.totalStock} en stock</div>
     </div>`;
   }).join('');
+}
+
+function openMercArticleSelector(modelo){
+  // Show colors inline — let user pick which color to restock
+  const articulos=getArticulosTodos();
+  const art=articulos[modelo.toUpperCase()];
+  if(!art) return;
+  const colores=Object.keys(art.colors);
+  
+  if(colores.length===1){
+    // Only one color, go directly
+    const items=art.colors[colores[0]].items;
+    const firstIdx=stock.indexOf(items[0]);
+    selMercExistente(firstIdx);
+  } else {
+    // Show color picker modal
+    _selectorModelo=modelo;
+    document.getElementById('sel-art-name').textContent='📦 Reponer: '+modelo;
+    document.getElementById('sel-art-sub').textContent='Elegí el color a reponer';
+    document.getElementById('sel-color-bar').innerHTML=colores.map(c=>{
+      const cdata=art.colors[c];
+      return`<button class="sel-color-btn" onclick="selMercFromSelector('${modelo.replace(/'/g,"\\'")}','${c.replace(/'/g,"\\'")}')">
+        ${c}
+        <span class="scb-stock">${cdata.totalStock} en stock</span>
+      </button>`;
+    }).join('');
+    document.getElementById('sel-talle-grid').innerHTML='<p style="color:var(--mid);font-size:.86rem;">⬆ Elegí un color para continuar.</p>';
+    document.getElementById('sel-cart-summary').style.display='none';
+    document.getElementById('modal-art-selector').classList.add('open');
+  }
+}
+
+function selMercFromSelector(modelo, color){
+  cerrarModal('modal-art-selector');
+  const articulos=getArticulosTodos();
+  const art=articulos[modelo.toUpperCase()];
+  if(!art||!art.colors[color]) return;
+  const items=art.colors[color].items;
+  const firstIdx=stock.indexOf(items[0]);
+  selMercExistente(firstIdx);
 }
 function selMercExistente(idx){
   const p=stock[idx];
